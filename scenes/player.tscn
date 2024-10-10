@@ -421,4 +421,4 @@ script = ExtResource("1_ikrrr")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_o5heu")
 animation = &"front_walking"
-frame_progress = 0.720686
+frame_progress = 0.0354443

@@ -24,9 +24,11 @@ extends CharacterBody2D
 #
 	#move_and_slide()
 
-const speed = 100
+const SPEED = 100
+
 
 var current_dir = "none"
+var direction = Vector2.ZERO
 
 func _ready():
 	$AnimatedSprite2D.play("front_idle")
@@ -35,61 +37,56 @@ func _physics_process(delta):
 	player_movement(delta)
 
 func player_movement(delta): #Captura el input de movimiento y lo ejectuta. 
-	if Input.is_action_pressed("ui_right"):
-		current_dir = "right" #Le asignamos a Current_dir hacia donde el sprite deberia mirar.
-		play_anim(1) #Ejecuta la función play_anim y le mandamos el (1) para significar que nos estamos moviendo.
-		velocity.x = speed #En este momento solo se puede mover en direcciones especificas. Averiguar diagonales.
-		velocity.y = 0
-	elif Input.is_action_pressed("ui_left"):
-		current_dir = "left"
-		play_anim(1)
-		velocity.x = -speed
-		velocity.y = 0	
-	elif Input.is_action_pressed("ui_down"):
-		current_dir = "down"
-		play_anim(1)
-		velocity.x = 0
-		velocity.y = speed	
-	elif Input.is_action_pressed("ui_up"):
-		current_dir = "up"
-		play_anim(1)
-		velocity.x = 0
-		velocity.y = -speed	
-	else:
-		play_anim(0) #Ejecuta la función play_anim y le mandamos el (0) para significar que no nos estamos moviendo.
-		velocity.x = 0
-		velocity.y = 0
+	#delta tiene el tiempo que se demoro en procesar el ultimo proceso.
+	#Obtener la dirección de movimiento a partir de las entradas
+	direction.x = Input.get_axis("ui_left", "ui_right")
+	direction.y = Input.get_axis("ui_up", "ui_down")
+	
+	
+	
+	# Normalizar el vector de dirección para mantener una velocidad constante
+	if direction != Vector2.ZERO:
+		direction = direction.normalized()
 		
+		
+	# Aplicar la velocidad al personaje
+	velocity = direction * SPEED
+	
+	play_anim()
+	
+	#if velocity != Vector2.ZERO:
+		#
+	#else:
+		#play_anim(0)
+	# Mover al personaje y manejar colisiones
 	move_and_slide()
 
-func play_anim(movement): #Maneja las animaciones.
-	var direction = current_dir
+
+
+
+func play_anim(): #Maneja las animaciones.
 	var animation = $AnimatedSprite2D
+	print(velocity == Vector2.ZERO," ", velocity != Vector2.ZERO)
 	
-	if direction == "right":
-		animation.flip_h = false #Si estuviera True nos permite mirror la animación
-		if movement == 1:
-			animation.play("side_walking")
-		elif movement == 0:
-			animation.play("side_idle")
-
-	if direction == "left":
-		animation.flip_h = true #Si estuviera True nos permite mirror la animación
-		if movement == 1:
-			animation.play("side_walking")
-		elif movement == 0:
-			animation.play("side_idle")
-
-	if direction == "down":
-		animation.flip_h = false #Si estuviera True nos permite mirror la animación
-		if movement == 1:
+	if direction.y > 0:
+		if velocity != Vector2.ZERO:
 			animation.play("front_walking")
-		elif movement == 0:
+		elif velocity.is_equal_approx(Vector2.ZERO):
 			animation.play("front_idle")
-
-	if direction == "up":
-		animation.flip_h = false #Si estuviera True nos permite mirror la animación
-		if movement == 1:
+	elif direction.y < 0:
+		if velocity != Vector2.ZERO:
 			animation.play("back_walking")
-		elif movement == 0:
+		elif velocity.is_equal_approx(Vector2.ZERO):
 			animation.play("back_idle")
+	elif direction.x > 0: #Right
+		if velocity != Vector2.ZERO:
+			animation.flip_h = false
+			animation.play("side_walking")
+		elif velocity.is_equal_approx(Vector2.ZERO):
+			animation.play("side_idle")
+	elif direction.x < 0: #Left
+		if velocity != Vector2.ZERO:
+			animation.flip_h = true
+			animation.play("side_walking")
+		elif velocity.is_equal_approx(Vector2.ZERO):
+			animation.play("side_idle")
