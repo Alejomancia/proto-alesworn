@@ -23,6 +23,10 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/scale=4.0
 
+[dotnet]
+
+project/assembly_name="proto-alesworn"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

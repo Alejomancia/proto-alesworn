@@ -29,9 +29,13 @@ const SPEED = 100
 
 var current_dir = "none"
 var direction = Vector2.ZERO
+@onready var animationPlayer = $AnimationPlayer
+@onready var animationTree = $AnimationTree
+@onready var animationState = animationTree.get("parameters/playback")
 
-func _ready():
-	$AnimatedSprite2D.play("front_idle")
+
+#func _ready():
+	#$AnimatedSprite2D.play("front_idle")
 
 func _physics_process(delta):
 	player_movement(delta)
@@ -65,28 +69,10 @@ func player_movement(delta): #Captura el input de movimiento y lo ejectuta.
 
 
 func play_anim(): #Maneja las animaciones.
-	var animation = $AnimatedSprite2D
-	print(velocity == Vector2.ZERO," ", velocity != Vector2.ZERO)
-	
-	if direction.y > 0:
-		if velocity != Vector2.ZERO:
-			animation.play("front_walking")
-		elif velocity.is_equal_approx(Vector2.ZERO):
-			animation.play("front_idle")
-	elif direction.y < 0:
-		if velocity != Vector2.ZERO:
-			animation.play("back_walking")
-		elif velocity.is_equal_approx(Vector2.ZERO):
-			animation.play("back_idle")
-	elif direction.x > 0: #Right
-		if velocity != Vector2.ZERO:
-			animation.flip_h = false
-			animation.play("side_walking")
-		elif velocity.is_equal_approx(Vector2.ZERO):
-			animation.play("side_idle")
-	elif direction.x < 0: #Left
-		if velocity != Vector2.ZERO:
-			animation.flip_h = true
-			animation.play("side_walking")
-		elif velocity.is_equal_approx(Vector2.ZERO):
-			animation.play("side_idle")
+	if direction != Vector2.ZERO:
+		animationTree.set("parameters/BS2D_Idle/blend_position", direction)
+		animationTree.set("parameters/BS2D_Run/blend_position", direction)
+		animationState.travel("BS2D_Run")
+	else:
+		animationState.travel("BS2D_Idle")
+		
